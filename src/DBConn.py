@@ -10,11 +10,7 @@ from typing import List, Optional
 
 import pgnproc
 
-logging.basicConfig(filename='log.txt',
-					filemode='a',
-					format="%(asctime)s - %(levelname)s - %(message)s", 
-		    		datefmt="%H:%M:%S",
-		    		level=logging.DEBUG)
+logger = logging.getLogger('__main__.' + __name__)
 
 class DBConn:
 	instance = None
@@ -44,17 +40,18 @@ class DBConn:
 			try:
 				self.conn = sqlite3.connect(self.name)
 				self.cursor = self.conn.cursor()
-				print('creating db')
+				logger.info('No existing database, creating database.')
 				self.create_tables()
 				return self.conn
 			except:
-				logging.debug("Error creating database.")
+				logger.critical("Error creating database.")
+				quit()
 		else:
 			try:
-				logging.debug("Connecting to database.")
+				logger.info("Connecting to database.")
 				return sqlite3.connect(self.name)
 			except sqlite3.Error as e:
-				logging.debug("Error connecting to database.")
+				logger.critical("Error connecting to database.")
 				quit()
 	
 	def __del__(self):
@@ -66,7 +63,7 @@ class DBConn:
 		Perform commit on database
 		"""
 
-		logging.debug("Committing to database.")
+		logger.info("Committing to database.")
 		self.conn.commit()
 
 	def drop_tables(self):
@@ -77,7 +74,7 @@ class DBConn:
 		with open('./SQLite_scripts/drop_tables.sql', 'r') as fh:
 			commands = fh.read()
 
-		logging.debug("Dropping all tables.")
+		logger.info("Dropping all tables.")
 		self.cursor.executescript(commands)
 		self.commit()
 
@@ -89,7 +86,7 @@ class DBConn:
 		with open('./SQLite_scripts/create_tables.sql', 'r') as fh:
 			commands = fh.read()
 		
-		logging.debug("Creating all tables.")
+		logger.info("Creating all tables.")
 		self.cursor.executescript(commands)
 		self.commit()
 
@@ -98,7 +95,7 @@ class DBConn:
 		Execute arbitrary command
 		"""
 
-		logging.debug(f"Executing command {command}.")
+		logger.debug(f"Executing command {command}.")
 		if arguments is None:
 			self.cursor.execute(command)
 		else:
@@ -110,7 +107,7 @@ class DBConn:
 		Execute arbitrary query
 		"""
 
-		logging.debug(f"Executing query {query}.")
+		logger.debug(f"Executing query {query}.")
 		if arguments is None:
 			return self.cursor.execute(query)
 		else:
@@ -123,7 +120,7 @@ class DBConn:
 
 		sql_command = "INSERT INTO User(username, account_open, last_fetched) VALUES(?,?,?)"
 
-		logging.debug(f"Adding user {user[0]}.")
+		logger.debug(f"Adding user {user[0]}.")
 		self.cursor.execute(sql_command, user)
 		if commit: self.conn.commit()
 
@@ -134,7 +131,7 @@ class DBConn:
 
 		sql_command = "INSERT OR IGNORE INTO User(username) VALUES(?)"
 
-		logging.debug(f"Adding users.")
+		logger.debug(f"Adding users.")
 		self.cursor.executemany(sql_command, users)
 		if commit: self.conn.commit()
 	
@@ -146,7 +143,7 @@ class DBConn:
 		sql_command = """INSERT OR IGNORE INTO Game(game_id, white, black, white_elo, black_elo, result, occurred_at, ECO)
 					     VALUES(?, (SELECT user_id FROM User WHERE username=?), (SELECT user_id FROM User WHERE username=?), ?, ?, ?, ?, ?)"""
 
-		logging.debug(f"Adding game {game[0]} vs. {game[1]} from {game[5]}.")
+		logger.debug(f"Adding game {game[0]} vs. {game[1]} from {game[5]}.")
 		self.cursor.execute(sql_command, game)
 		if commit: self.conn.commit()
 	
@@ -158,7 +155,7 @@ class DBConn:
 		sql_command = """INSERT OR IGNORE INTO Game(game_id, white, black, white_elo, black_elo, result, occurred_at, ECO)
 					     VALUES(?, (SELECT user_id FROM User WHERE username=?), (SELECT user_id FROM User WHERE username=?), ?, ?, ?, ?, ?)"""
 
-		logging.debug(f"Adding games.")
+		logger.debug(f"Adding games.")
 		self.cursor.executemany(sql_command, games)
 		if commit: self.conn.commit()
 	
@@ -172,7 +169,7 @@ class DBConn:
 		# Condition inputs
 		moves = [(x[5], x[5].split(' ')[1]) for x in moves]
 
-		logging.debug("Adding positions to database.")
+		logger.debug("Adding positions to database.")
 		self.cursor.executemany(sql_command, moves)
 		if commit: self.commit()
 	
@@ -186,7 +183,7 @@ class DBConn:
 		# Condition inputs
 		moves = [(x[5], x[2], x[3]) for x in moves]
 
-		logging.debug("Creating moves.")
+		logger.debug("Creating moves.")
 		self.cursor.executemany(sql_command, moves)
 		if commit: self.commit()
 	
@@ -200,7 +197,7 @@ class DBConn:
 		# Condition inputs
 		moves = [(x[0], x[5], x[2], x[1], x[4]) for x in moves]
 
-		logging.debug("Creating game/move associations.")
+		logger.debug("Creating game/move associations.")
 		self.cursor.executemany(sql_command, moves)
 		if commit: self.commit()
 
@@ -239,7 +236,7 @@ class DBConn:
 			self.sf_depth = depth
 			return True
 		else:
-			logging.debug(f"Depth of {depth} rejected.")
+			logger.warning(f"Depth of {depth} rejected.")
 			return False
 
 	def does_game_exist_by_id(self, game_id: int) -> bool:
@@ -276,7 +273,7 @@ class DBConn:
 		# Request positions without an evaluation
 		self.cursor.execute(sql_read_command, (game_id, self.sf_depth))
 		resp = self.cursor.fetchall()
-		print(f"Evaluating {len(resp)} positions.")
+		logger.info(f"Evaluating {len(resp)} positions.")
 
 		# Get the evaluations
 		if parallel:
@@ -284,8 +281,7 @@ class DBConn:
 		else:
 			evaluations = self.eval_positions(resp)
 
-		print("Done evaluating positions.")
-		logging.debug("Done evaluating positions.")
+		logger.debug("Done evaluating positions.")
 
 		# Write all of the evaluations to the database
 		self.cursor.executemany(sql_write_command, evaluations)
@@ -310,8 +306,7 @@ class DBConn:
 		else:
 			evaluations = self.eval_positions(resp)
 
-		print("Done evaluating positions.")
-		logging.debug("Done evaluating positions.")
+		logger.debug("Done evaluating positions.")
 
 		# Write all of the evaluations to the database
 		self.cursor.executemany(sql_write_command, evaluations)
@@ -362,7 +357,7 @@ class DBConn:
 		Helper function to evaluate a single position with Stockfish
 		"""
 
-		logging.debug(f"Position {position_id} - Start - {position}")
+		logger.debug(f"Position {position_id} - Start - {position}")
 		# Set the board position
 		sf.set_fen_position(position)
 
@@ -390,7 +385,7 @@ class DBConn:
 		c = tuple(safe_get_tuple(clean_top_3, i)[2] for i in range(3))
 
 		# Return the tuple to be inserted into SQL command
-		logging.debug(f"Position {position_id} - Done  - {position}")
+		logger.debug(f"Position {position_id} - Done  - {position}")
 		return (depth, *a, *b, *c, position_id)
 
 

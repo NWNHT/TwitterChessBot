@@ -1,4 +1,5 @@
 
+import logging
 import os
 from typing import List, Optional
 
@@ -7,6 +8,8 @@ import tweepy as tp
 
 dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
+
+logger = logging.getLogger('__main__.' + __name__)
 
 class TwitterAPI:
     """
@@ -47,7 +50,7 @@ class TwitterAPI:
             print("Authorize using pin auth.")
             self.twitter_pin_auth()
         else:
-            print("Tokens already present")
+            logger.info("Tokens already present")
             self.access_token = os.environ.get('TWITTER_ACCESS_TOKEN')
             self.access_token_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
             
@@ -80,7 +83,7 @@ class TwitterAPI:
                                     callback='oob')
 
         # Have user enter pin
-        print(auth.get_authorization_url())
+        print(f"Please access this URL: {auth.get_authorization_url()}")
         verif = input("Input PIN: ")
         self.access_token, self.access_token_secret = auth.get_access_token(verif)
         
@@ -102,11 +105,13 @@ class TwitterAPI:
         """
 
         try:
+            logger.debug('Twit debug test')
+            logger.info('Twit info test')
             results = self.api.search_30_day(self.label,
                                              query=self.query,
                                              maxResults=self.maxResults)
         except Exception as e:
-            print(f"Error querying latest tweets: {e}")
+            logger.error(f"Error querying latest tweets: {e}")
             quit()
         
         tweets = []
@@ -123,7 +128,7 @@ class TwitterAPI:
         """
 
         for reply in replies:
-            print(f"For tweet: {reply}")
+            logger.info(f"Replying to tweet: {reply}")
             media = self.api.media_upload(reply[1])
 
             self.api.update_status("Test reply with api", 

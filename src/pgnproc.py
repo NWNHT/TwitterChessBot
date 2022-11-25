@@ -5,6 +5,7 @@ import asyncio
 import chess
 import chess.pgn
 import io
+import logging
 import os
 from pathlib import Path
 import re
@@ -12,6 +13,7 @@ from typing import Coroutine, Dict, List, Optional, Set, Tuple
 
 from chessdotcom.aio import ChessDotComError, Client, get_player_game_archives, get_player_games_by_month_pgn, get_player_stats
 
+logger = logging.getLogger('__main__/' + __name__)
 
 read_size = 1000000
 global_pgn_directory = str(Path(__file__).parent.parent) + "/pgns/"
@@ -33,16 +35,16 @@ async def save_player_games_by_month(username: str, year: str, month: str, pgn_d
     filepath = f"{pgn_directory}{username}/{year}-{month}.txt"
     # This is an exceptionally bad handling of the possibility of a 429 error from chess.com, has worked so far though
     try:
-        print(f"Start file {year}-{month} for {username}.")
+        logging.info(f"Start file {year}-{month} for {username}.")
         data = await get_player_games_by_month_pgn(username=username, year=year, month=month)
     except ChessDotComError:
-        print(f"Failure on {year}-{month} for {username}.  Trying again.")
+        logging.warning(f"Failure on {year}-{month} for {username}.  Trying again.")
         data = await get_player_games_by_month_pgn(username=username, year=year, month=month)
 
     # Write the result to appropriate file
     with open(filepath, 'w') as fh:
         fh.write(data.text)
-    print(f"Wrote file {year}-{month} for {username}.")
+    logging.info(f"Wrote file {year}-{month} for {username}.")
 
 
 def make_player_games_by_month_coro(requests: Dict[str, Dict]) -> List[Coroutine]:
@@ -104,7 +106,7 @@ def make_queries(requests: Dict[str, Dict], pgn_directory: str = global_pgn_dire
             make_directory(username, pgn_directory=pgn_directory)
             with open(f"{pgn_directory}{username}/{date}.txt", 'w') as fh:
                 fh.write(pgn)
-        print(f"Completed requests for {username}.")
+        logging.info(f"Completed chess.com requests for {username}.")
     return requests
 
 
@@ -224,7 +226,7 @@ def single_pgn_to_lists_by_username(username: str, month: str, base_directory_na
         userlist.update(users)
         movelist.extend(moves)
     except FileExistsError:
-        print("File Exists Error while reading pgn.")
+        logging.error("File Exists Error while reading pgn.")
         quit()
 
     return gamelist, userlist, movelist

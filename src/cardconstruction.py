@@ -10,6 +10,8 @@ from DBConn import DBConn
 import pgnproc
 import twitter_access as ta
 
+logger = logging.getLogger('__main__.' + __name__)
+
 class CardConstruction:
     """
     Request, store, process, store, and plot data from chess.com, specified by game_id
@@ -28,12 +30,13 @@ class CardConstruction:
         """
         Take the game_id, orchestrate the whole retrieval and output
         """
+
         self.game_id = game_id
-        print(f"Generating for game: {self.game_id}")
+        logger.info(f"Generating for game: {self.game_id}")
 
         # Check if game_id is in the database
         if not self.db.does_game_exist_by_id(self.game_id):
-            print("Game not in database")
+            logger.info("Game not in database")
 
             # Get the game details for requesting data
             username, month = self._get_game_details()
@@ -44,7 +47,7 @@ class CardConstruction:
             # Add the games from the pgn to the database
             self._add_archieve_to_db(username, month)
         else:
-            print("Game present")
+            logger.info("Game present")
         
         # Evaluate game
         self._evaluate_game()
@@ -62,7 +65,7 @@ class CardConstruction:
         try:
             json_resp = requests.get(self.details_url_base + str(self.game_id)).json()
         except Exception as e:
-            logging.error(f"Error requesting game data from Chess.com: {e}")
+            logger.error(f"Error requesting game data from Chess.com: {e}")
             quit()
 
         # Extract the players and date from game details
@@ -83,8 +86,7 @@ class CardConstruction:
         try:
             pgnproc.download_by_username_list_and_month_list_better([user], [month])
         except Exception as e:
-            print(e)
-            logging.error(f"Error requesting pgns: {e}")
+            logger.error(f"Error requesting pgns: {e}")
             quit()
     
     def _add_archieve_to_db(self, username: str, month: str):

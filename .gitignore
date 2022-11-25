@@ -3,6 +3,7 @@
 .env
 
 log.txt
+log.log
 
 chesscom_db.db
 

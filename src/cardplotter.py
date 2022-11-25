@@ -1,3 +1,5 @@
+
+import logging
 import numpy as np
 import pandas as pd
 import patchworklib as pw
@@ -10,6 +12,7 @@ from DBConn import DBConn
 from PlotnineElements import PlotnineElements as pe, blank
 from ChessPlotterColourScheme import ChessPlotterColourScheme as cpcs
 
+logger = logging.getLogger('__main__.' + __name__)
 
 class CardPlotter:
     """
@@ -47,9 +50,9 @@ class CardPlotter:
         try:
             filename = filepath + f"{self.game_id}"
             p.savefig(fname=filename)
-            print("Saved card")
+            logger.info("Saved card")
         except Exception as e:
-            print(f"Error saving card: {e}")
+            logger.error(f"Error saving card: {e}")
             quit()
         
         return filename + '.png'
@@ -64,7 +67,7 @@ class CardPlotter:
         try:
             resp = self.db.execute_query(eval_material_query, (self.game_id,))
         except Exception as e:
-            print(f"Error requesting evaluation data: {e}")
+            logger.error(f"Error requesting evaluation data: {e}")
             quit()
         
         # Create database
@@ -108,7 +111,7 @@ class CardPlotter:
                     )
 
         except Exception as e:
-            print(f"Error generating evaluation plot: {e}")
+            logger.error(f"Error generating evaluation plot: {e}")
             quit()
                 
         return g
@@ -123,7 +126,7 @@ class CardPlotter:
         try:
             resp = self.db.execute_query(time_balance_query, (self.game_id, self.game_id))
         except Exception as e:
-            print(f"Error requesting time data: {e}")
+            logger.error(f"Error requesting time data: {e}")
             quit()
         
         # Create database
@@ -165,7 +168,7 @@ class CardPlotter:
                     )
 
         except Exception as e:
-            print(f"Error generated while plotting time balance: {e}")
+            logger.error(f"Error generated while plotting time balance: {e}")
             quit()
         
         return g
@@ -179,7 +182,7 @@ class CardPlotter:
         try:
             resp = self.db.execute_query(eval_loss_query, (self.game_id,))
         except Exception as e:
-            print(f"Error requesting time data: {e}")
+            logger.error(f"Error requesting time data: {e}")
             quit()
         
         # Create database
@@ -213,7 +216,7 @@ class CardPlotter:
                     )
 
         except Exception as e:
-            print(f"Error while generating loss plot: {e}")
+            logger.error(f"Error while generating loss plot: {e}")
             quit()
         
         return g
@@ -227,7 +230,7 @@ class CardPlotter:
         try:
             resp = self.db.execute_query(hist_query, (self.game_id,))
         except Exception as e:
-            print(f"Error requesting histogram data: {e}")
+            logger.error(f"Error requesting histogram data: {e}")
             quit()
         
         # Create database
@@ -260,7 +263,7 @@ class CardPlotter:
                     )
 
         except Exception as e:
-            print(f"Error while generating loss plot: {e}")
+            logger.error(f"Error while generating loss plot: {e}")
             quit()
         
         return g
@@ -281,7 +284,7 @@ class CardPlotter:
             move_rank_count_stat = self.db.execute_query(move_rank_count_stat_query, (self.game_id,))
             move_rank_count_stat = move_rank_count_stat.fetchall()
         except Exception as e:
-            print(f"Error requesting statistics data: {e}")
+            logger.error(f"Error requesting statistics data: {e}")
             quit()
         
         # Create dataframe from requested data
@@ -342,7 +345,7 @@ class CardPlotter:
             summary = self.db.execute_query(summary_query, (self.game_id,))
             summary = summary.fetchall()[0]
         except Exception as e:
-            print(f"Error requesting histogram data: {e}")
+            logger.error(f"Error requesting histogram data: {e}")
             quit()
         
         names = f"{summary[0]} vs. {summary[1]}"
