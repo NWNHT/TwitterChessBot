@@ -189,7 +189,6 @@ class CardPlotter:
         df['eval_diff'] = df['eval_diff'].apply(self.eval_boundary)
         # df.loc[df.eval_diff > 10, 'eval_diff'] = 10
         # df.loc[df.eval_diff < -10, 'eval_diff'] = -10
-        print(df)
 
         try:
             g = (gg.ggplot(df, gg.aes(x='move_num', y='eval_diff', colour='colour')) 
