@@ -273,7 +273,7 @@ class DBConn:
 		# Request positions without an evaluation
 		self.cursor.execute(sql_read_command, (game_id, self.sf_depth))
 		resp = self.cursor.fetchall()
-		logger.info(f"Evaluating {len(resp)} positions.")
+		logger.info(f"Evaluating {len(resp)} positions at depth {self.sf_depth}.")
 
 		# Get the evaluations
 		if parallel:

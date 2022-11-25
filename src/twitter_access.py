@@ -16,7 +16,7 @@ class TwitterAPI:
     Class for access of the Twitter API using tweepy
     """
 
-    def __init__(self):
+    def __init__(self, max_tweet_results: int = 10):
         
         # Consumer tokens
         self.API_key = os.environ.get('TWITTER_CONSUMER_API_KEY')
@@ -33,7 +33,7 @@ class TwitterAPI:
         # Search
         self.label = 'Testing'
         self.query = '#chessindata'
-        self.maxResults = 10
+        self.maxResults = max_tweet_results
 
         # Test
         self.latest_responded = 0
@@ -105,8 +105,6 @@ class TwitterAPI:
         """
 
         try:
-            logger.debug('Twit debug test')
-            logger.info('Twit info test')
             results = self.api.search_30_day(self.label,
                                              query=self.query,
                                              maxResults=self.maxResults)

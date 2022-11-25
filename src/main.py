@@ -1,4 +1,5 @@
 
+import argparse
 import logging
 import patchworklib as pw
 import time
@@ -8,7 +9,7 @@ from cardplotter import CardPlotter
 from DBConn import DBConn
 import twitter_access as ta
 
-def main():
+def main(args):
 
     # Logging
     # Create formatter and the two handlers
@@ -22,23 +23,21 @@ def main():
     f_handler.setFormatter(log_format)
     s_handler.setFormatter(log_format)
 
-    # Apply the handlers and logging level of the loggers
-    # logger.basicConfig(handlers=[f_handler, s_handler], level=logging.DEBUG)
-
     # Get the logger
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(f_handler)
     logger.addHandler(s_handler)
 
+
     # Get database access (create if doesn't exist)
-    db = DBConn('chesscom_db.db')
+    db = DBConn('chesscom_db.db', sf_depth=args.default_depth)
     # Create plotting object
     plotter = CardPlotter(db=db)
     # Create the card construction object
     cc = CardConstruction(db=db, plotter=plotter)
     # Create object to access Twitter API
-    twitAPI = ta.TwitterAPI()
+    twitAPI = ta.TwitterAPI(max_tweet_results=args.max_tweet_results)
 
     # Loop until process is interrupted
     while 1:
@@ -53,10 +52,38 @@ def main():
             twitAPI.reply(responses)
         else:
             logger.info("No new tweets.")
-            logger.debug('debug test - __main__')
 
-        time.sleep(30)
+        time.sleep(int(args.poll_period))
 
+def parse_arguments():
+    """
+    Parse the command-line arguments
+    """
+
+    parser = argparse.ArgumentParser(prog='TwitterChessBot',
+                                     description='A bot to scan #chessindata and respond with an infographic.')
+    
+    # This should be between 1 and 20, this is enforced by DBConn
+    parser.add_argument('--default_depth',
+                        help='set default evaluation depth in moves - [1, 20]',
+                        action='store',
+                        default=15)
+    
+    # Anything less than 30s is probably overkill, this is not enforced/checked anywhere
+    parser.add_argument('--poll_period',
+                        help='set period of the Twitter poll in seconds - [30, inf)',
+                        action='store',
+                        default=30)
+
+    # This must be between 10 and 100 inclusive, anything beyond this range will cause a Twitter API error
+    parser.add_argument('--max_tweet_results',
+                        help='set maximum tweets pulled in a request - [10, 100]',
+                        action='store',
+                        default=10)
+    
+    return parser.parse_args()
 
 if __name__ == '__main__':
-    main()
+    args = parse_arguments()
+
+    main(args)
