@@ -1,0 +1,16 @@
+.DS_Store
+
+.env
+
+log.txt
+
+chesscom_db.db
+
+__pycache__/
+
+pgns/*
+!pgns/.gitkeep
+
+cards/*
+!cards/.gitkeep
+
