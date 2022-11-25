@@ -64,20 +64,23 @@ def parse_arguments():
                                      description='A bot to scan #chessindata and respond with an infographic.')
     
     # This should be between 1 and 20, this is enforced by DBConn
-    parser.add_argument('--default_depth',
-                        help='set default evaluation depth in moves - [1, 20]',
+    parser.add_argument('-d',
+                        '--default_depth',
+                        help='set default evaluation depth in moves - Default: 15 - Range: [1, 20]',
                         action='store',
                         default=15)
     
     # Anything less than 30s is probably overkill, this is not enforced/checked anywhere
-    parser.add_argument('--poll_period',
-                        help='set period of the Twitter poll in seconds - [30, inf)',
+    parser.add_argument('-p',
+                        '--poll_period',
+                        help='set period of the Twitter poll in seconds - Default: 30 - Range: [30, inf)',
                         action='store',
                         default=30)
 
     # This must be between 10 and 100 inclusive, anything beyond this range will cause a Twitter API error
-    parser.add_argument('--max_tweet_results',
-                        help='set maximum tweets pulled in a request - [10, 100]',
+    parser.add_argument('-m',
+                        '--max_tweet_results',
+                        help='set maximum tweets pulled in a request - Default: 10 - Range: [10, 100]',
                         action='store',
                         default=10)
     
