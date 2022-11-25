@@ -12,9 +12,11 @@ from ChessPlotterColourScheme import ChessPlotterColourScheme as cpcs
 
 
 class CardPlotter:
+    """
+    Create all of the separate plots and combine them with patchworklib
+    """
 
     def __init__(self, db: DBConn, fig_size: tuple=(6, 2)):
-        # This assumes that all positions are already present and evaluated
         self.db = db
         self.game_id = None
         self.fig_size = fig_size
@@ -145,7 +147,6 @@ class CardPlotter:
                     + gg.theme(figure_size=self.fig_size)
                     + gg.geom_label(gg.aes(x=(self.x_limit - 1)*0.02 + 1, y=bottom_limit * 0.875), ha='left', size=16, label='Black Time Advantage', colour=cpcs.black, fill=cpcs.white)
                     + gg.geom_label(gg.aes(x=(self.x_limit - 1)*0.02 + 1, y=top_limit * 0.875), ha='left', size=16, label='White Time Advantage', colour=cpcs.black, fill=cpcs.white)
-                    # + gg.geom_label(gg.aes(y='clock_diff', label='move_num'))
 
                     + gg.scale_colour_manual(values=cpcs.colour2)
                     + gg.scale_x_continuous(limits=(1, self.x_limit), expand=(0, 0), breaks=lambda x: range(0, int(x[1]), 10))
@@ -187,17 +188,13 @@ class CardPlotter:
         # Convert centipawns to pawns, limit to +/- 10
         df['eval_diff'] = df['eval_diff'] / 100
         df['eval_diff'] = df['eval_diff'].apply(self.eval_boundary)
-        # df.loc[df.eval_diff > 10, 'eval_diff'] = 10
-        # df.loc[df.eval_diff < -10, 'eval_diff'] = -10
 
         try:
             g = (gg.ggplot(df, gg.aes(x='move_num', y='eval_diff', colour='colour')) 
                     + gg.geom_line(size=2)
-                    # + gg.geom_label(gg.aes(label='move_num'))
 
                     + gg.theme(figure_size=self.fig_size)
                     
-                    # + gg.scale_colour_manual(values=cpcs.colour2, guide=False)
                     + gg.scale_colour_manual(values=[cpcs.black, cpcs.white], guide=False)
                     + gg.scale_x_continuous(limits=(1, self.x_limit), expand=(0, 0), breaks=lambda x: range(0, int(x[1]), 10))
                     + gg.scale_y_continuous(limits=(-10, 10), expand=(0, 0), breaks=range(-10, 12, 2), labels=['-10', '', '-6', '', '-2', '', '2', '', '6', '', '10'])
@@ -239,8 +236,6 @@ class CardPlotter:
         # Convert centipawns to pawns, limit to +/- 10
         df['eval_diff'] = df['eval_diff'] / 100
         df['eval_diff'] = df['eval_diff'].apply(self.eval_boundary)
-        # df.loc[df.eval_diff > 10, 'eval_diff'] = 10
-        # df.loc[df.eval_diff < -10, 'eval_diff'] = -10
 
         # Generate Plot
         try:
@@ -298,6 +293,7 @@ class CardPlotter:
             for i, v in enumerate([1, 2, 3, 5]):
                 if move_rank_count_stat[i][0] != v:
                     move_rank_count_stat.insert(i, (v, 0, 0))
+
         move_rank_count_stat = [[x[i] for x in move_rank_count_stat] for i in range(1, 3)]
         df = pd.concat([df,
                         pd.DataFrame(move_rank_count_stat, columns=['Best Move', 'Second Best Move', 'Third Best Move', 'Other Moves'])
@@ -322,7 +318,6 @@ class CardPlotter:
                     + gg.coord_flip()
                     + gg.theme(figure_size=self.fig_size)
                     
-                    # + gg.scale_fill_manual(values=cpcs.colour2, guide=False)
                     + gg.scale_fill_manual(values=[cpcs.black, cpcs.white], guide=False)
                     + gg.scale_colour_manual(values=[cpcs.white, cpcs.black], guide=False)
                     + gg.scale_y_continuous(limits=(-df_melt.value.abs().max()*1.2, df_melt.value.abs().max()*1.2), expand=(0, 0))

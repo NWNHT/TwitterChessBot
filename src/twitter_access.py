@@ -9,6 +9,9 @@ dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
 
 class TwitterAPI:
+    """
+    Class for access of the Twitter API using tweepy
+    """
 
     def __init__(self):
         
@@ -89,9 +92,9 @@ class TwitterAPI:
         """
         Update the latest responded field, to be used on startup
         """
+
         latest = self.search_hashtag()[0]
         self.latest_responded = latest[0]
-        # self.latest_responded = 1595546697018802176 # testing value
 
     def search_hashtag(self):
         """
@@ -102,7 +105,6 @@ class TwitterAPI:
             results = self.api.search_30_day(self.label,
                                              query=self.query,
                                              maxResults=self.maxResults)
-            # print(f"Found {len(results)} tweets.")
         except Exception as e:
             print(f"Error querying latest tweets: {e}")
             quit()
@@ -123,7 +125,6 @@ class TwitterAPI:
         for reply in replies:
             print(f"For tweet: {reply}")
             media = self.api.media_upload(reply[1])
-            # media = self.api.media_upload('./cards/44672402709.png')
 
             self.api.update_status("Test reply with api", 
                                    in_reply_to_status_id=reply[0], 

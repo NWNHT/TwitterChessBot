@@ -35,6 +35,9 @@ class DBConn:
 		self.engine.set_depth(self.sf_depth)
 	
 	def connect(self):
+		"""
+		Check if database exists and return cursor, if no database then create one and initialize with script.
+		"""
 		
 		# Create db and make tables if it does not exist
 		if not isfile('./chesscom_db.db'):
@@ -59,12 +62,17 @@ class DBConn:
 		self.conn.close()
 	
 	def commit(self):
-		"""Perform commit on database"""
+		"""
+		Perform commit on database
+		"""
+
 		logging.debug("Committing to database.")
 		self.conn.commit()
 
 	def drop_tables(self):
-		"""Drop all chess database tables"""
+		"""
+		Drop all chess database tables
+		"""
 
 		with open('./SQLite_scripts/drop_tables.sql', 'r') as fh:
 			commands = fh.read()
@@ -74,7 +82,9 @@ class DBConn:
 		self.commit()
 
 	def create_tables(self):
-		"""Create all chess database tables"""
+		"""
+		Create all chess database tables
+		"""
 
 		with open('./SQLite_scripts/create_tables.sql', 'r') as fh:
 			commands = fh.read()
@@ -84,7 +94,9 @@ class DBConn:
 		self.commit()
 
 	def execute_command(self, command: str, arguments: Optional[tuple], commit: bool=True):
-		"""Execute arbitrary command"""
+		"""
+		Execute arbitrary command
+		"""
 
 		logging.debug(f"Executing command {command}.")
 		if arguments is None:
@@ -94,7 +106,9 @@ class DBConn:
 		if commit: self.commit()
 
 	def execute_query(self, query: str, arguments: Optional[tuple]=None):
-		"""Execute arbitrary query"""
+		"""
+		Execute arbitrary query
+		"""
 
 		logging.debug(f"Executing query {query}.")
 		if arguments is None:
@@ -103,7 +117,9 @@ class DBConn:
 			return self.cursor.execute(query, arguments)
 
 	def create_user(self, user, commit: bool=True):
-		"""Create a user"""
+		"""
+		Create a user
+		"""
 
 		sql_command = "INSERT INTO User(username, account_open, last_fetched) VALUES(?,?,?)"
 
@@ -112,7 +128,9 @@ class DBConn:
 		if commit: self.conn.commit()
 
 	def create_users(self, users: set, commit: bool=True):
-		"""Create users from a set"""
+		"""
+		Create users from a set
+		"""
 
 		sql_command = "INSERT OR IGNORE INTO User(username) VALUES(?)"
 
@@ -121,7 +139,9 @@ class DBConn:
 		if commit: self.conn.commit()
 	
 	def create_game(self, game: tuple, commit: bool=True):
-		"""Create a game"""
+		"""
+		Create a game
+		"""
 
 		sql_command = """INSERT OR IGNORE INTO Game(game_id, white, black, white_elo, black_elo, result, occurred_at, ECO)
 					     VALUES(?, (SELECT user_id FROM User WHERE username=?), (SELECT user_id FROM User WHERE username=?), ?, ?, ?, ?, ?)"""
@@ -131,7 +151,9 @@ class DBConn:
 		if commit: self.conn.commit()
 	
 	def create_games(self, games: List[tuple], commit: bool=True):
-		"""Create games, create_users should be run before this to populate the User table"""
+		"""
+		Create games, create_users should be run before this to populate the User table
+		"""
 
 		sql_command = """INSERT OR IGNORE INTO Game(game_id, white, black, white_elo, black_elo, result, occurred_at, ECO)
 					     VALUES(?, (SELECT user_id FROM User WHERE username=?), (SELECT user_id FROM User WHERE username=?), ?, ?, ?, ?, ?)"""
@@ -141,7 +163,9 @@ class DBConn:
 		if commit: self.conn.commit()
 	
 	def create_positions(self, moves: List[tuple], commit: bool=True):
-		"""Create all positions from the move list"""
+		"""
+		Create all positions from the move list
+		"""
 
 		sql_command = """INSERT OR IGNORE INTO Position(fen, colour) VALUES(?, ?)"""
 
@@ -153,7 +177,9 @@ class DBConn:
 		if commit: self.commit()
 	
 	def create_moves(self, moves: List[tuple], commit: bool=True):
-		"""Create all moves from move list"""
+		"""
+		Create all moves from move list
+		"""
 
 		sql_command = """INSERT OR IGNORE INTO Move(position_id, move_uci, move_san) VALUES((SELECT position_id FROM Position WHERE fen=?), ?, ?)"""
 
@@ -165,7 +191,9 @@ class DBConn:
 		if commit: self.commit()
 	
 	def create_gamemoves(self, moves: List[tuple], commit: bool=True):
-		"""Create all of the gamemoves"""
+		"""
+		Create all of the gamemoves
+		"""
 		
 		sql_command = """INSERT OR IGNORE INTO GameMove(game_id, move_id, move_num, clock) VALUES(?, (SELECT move_id FROM Move WHERE position_id=(SELECT position_id FROM Position WHERE fen=?) AND move_uci=?), ?, ?)"""
 
@@ -228,7 +256,9 @@ class DBConn:
 		return bool(len(resp))
 
 	def evaluate_game_by_id(self, game_id: int, parallel: bool=False, commit: bool=True):
-		"""Evaluate the next n positions in the database"""
+		"""
+		Evaluate all positions from the given game_id
+		"""
 
 		sql_read_command = """	SELECT p.position_id, p.fen
 								FROM Game g
@@ -262,7 +292,9 @@ class DBConn:
 		if commit: self.commit()
 	
 	def evaluate_next_n_positions(self, number_of_positions: int=10, parallel: bool=False, commit: bool=True):
-		"""Evaluate the next n positions in the database"""
+		"""
+		Evaluate the next n positions in the database
+		"""
 		# TODO: Could modify query to order by eval_depth and then once all positions had been evaluated you could go through it again at a higher depth
 
 		sql_read_command = """SELECT position_id, fen FROM Position WHERE eval_depth IS NULL LIMIT ?"""
@@ -286,13 +318,17 @@ class DBConn:
 		if commit: self.commit()
 	
 	def eval_positions(self, positions: List[tuple], commit: bool = True):
-		"""Evaluate the given list of positions"""
+		"""
+		Evaluate the given list of positions
+		"""
 		# TODO: Potential feature to give a single worker multiple positions to remove some of the overhead of creating the stockfish instance
 		evaluations = [DBConn.evaluate_position(self.engine, pos_id, fen, self.sf_depth) for pos_id, fen in positions]
 		return evaluations
 	
 	def eval_positions_parallel(self, positions: List[tuple], commit: bool=True):
-		"""Evalute positions in a parallel manner using multiprocessing"""
+		"""
+		Evalute positions in a parallel manner using multiprocessing
+		"""
 		# Condition response for multiprocessing by adding depth
 		positions = [(t[0], t[1], self.sf_depth) for t in positions]
 
@@ -311,7 +347,9 @@ class DBConn:
 
 	@staticmethod
 	def eval_positions_parallel_helper(position_id: int, position: str, depth: int):
-		"""Initialize Stockfish instance for each parallel call to evaluate_position, to be used by DBConn.eval_positions_parallel"""
+		"""
+		Initialize Stockfish instance for each parallel call to evaluate_position, to be used by DBConn.eval_positions_parallel
+		"""
 		# Initialize sf
 		sf = Stockfish(path='/opt/homebrew/bin/stockfish')
 		sf.set_depth(depth)
@@ -320,8 +358,10 @@ class DBConn:
 
 	@staticmethod
 	def evaluate_position(sf: Stockfish, position_id: int, position: str, depth: int):
-		"""Helper function to evaluate a single position with Stockfish"""
-		# print(f"Starting for position: {position_id} - {position}")
+		"""
+		Helper function to evaluate a single position with Stockfish
+		"""
+
 		logging.debug(f"Position {position_id} - Start - {position}")
 		# Set the board position
 		sf.set_fen_position(position)
@@ -350,7 +390,6 @@ class DBConn:
 		c = tuple(safe_get_tuple(clean_top_3, i)[2] for i in range(3))
 
 		# Return the tuple to be inserted into SQL command
-		# print(f"Finishing position: {position_id} - {position}")
 		logging.debug(f"Position {position_id} - Done  - {position}")
 		return (depth, *a, *b, *c, position_id)
 

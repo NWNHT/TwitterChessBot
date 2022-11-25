@@ -7,7 +7,6 @@ blank = gg.element_blank()
 
 
 class PlotnineElements:
-
     """
     Class of static methods to modify plotnine plots
     """
@@ -20,7 +19,9 @@ class PlotnineElements:
     def text(size: Optional[int] = None,
              colour: Optional[str] = None,
              weight: Optional[str] = None):
-        """Text size, colour and weight, excluded arguments will take default values"""
+        """
+        Text size, colour and weight, excluded arguments will take default values
+        """
         
         return gg.theme(text=gg.element_text(size=size, color=colour, weight=weight))
 
@@ -31,7 +32,9 @@ class PlotnineElements:
                title_size: Optional[int] = None,
                x_size: Optional[int] = None,
                y_size: Optional[int] = None):
-        """Labels for plotnine, excluded arguments will take default values, label arguments with '' will be blank"""
+        """
+        Labels for plotnine, excluded arguments will take default values, label arguments with '' will be blank
+        """
         # This can have weird effects with gg.flip_coords()
 
         # Return a list of the functions to be applied
@@ -48,7 +51,9 @@ class PlotnineElements:
                     y: Optional[tuple[Union[int, float, None], Union[int, float, None]]] = (None, None),
                     y_expand: Optional[tuple[Union[int, float], Union[int, float]]] = None,
                     ):
-        """Axis limits using scale_x/y_continuous, excluded arguments will take default values"""
+        """
+        Axis limits using scale_x/y_continuous, excluded arguments will take default values
+        """
 
         return [gg.scale_x_continuous(limits=x, expand=x_expand),
                 gg.scale_y_continuous(limits=y, expand=y_expand)]
@@ -62,7 +67,9 @@ class PlotnineElements:
                      minor: bool = False,
                      x: bool = False,
                      y: bool = False):
-        """Remove axis ticks as specified by arguments, True to remove"""
+        """
+        Remove axis ticks as specified by arguments, True to remove
+        """
 
         return gg.theme(axis_ticks_minor_x=(blank if x_minor or minor or x else None),
                         axis_ticks_minor_y=(blank if y_minor or minor or y else None),
@@ -78,7 +85,9 @@ class PlotnineElements:
                     minor: bool = False,
                     x: bool = False,
                     y: bool = False):
-        """Remove axis ticks as specified by arguments, True to remove"""
+        """
+        Remove axis ticks as specified by arguments, True to remove
+        """
 
         return gg.theme(panel_grid_minor_x=(blank if x_minor or minor or x else None),
                         panel_grid_minor_y=(blank if y_minor or minor or y else None),
@@ -89,7 +98,9 @@ class PlotnineElements:
     def background_colour(colour: Optional[str] = None,
                           plot_colour: Optional[str] = None,
                           panel_colour: Optional[str] = None):
-        """Specify background colour.  Set both with colour or separately with plot and panel.  Plot is the entire """
+        """
+        Specify background colour.  Set both with colour or separately with plot and panel.  Plot is the entire area
+        """
 
         if colour is not None:
             return gg.theme(plot_background = gg.element_rect(fill=colour, colour=colour),
@@ -103,14 +114,15 @@ class PlotnineElements:
             
 
 class ImageCombine:
-
     """
     Utility class just for combining images horizontally or vertically.
     """
 
     @staticmethod
     def combine_plots_vertical(images: List, base_filepath: str = "./") -> Image.Image:
-        """Combine given images into a single image"""
+        """
+        Combine given images into a single image
+        """
         images = [Image.open(base_filepath + x) for x in images]
         widths, heights = zip(*(i.size for i in images))
 
@@ -130,7 +142,9 @@ class ImageCombine:
     
     @staticmethod
     def combine_plots_horizontal(images: List, base_filepath: str = "./") -> Image.Image:
-        """Combine given images into a single image"""
+        """
+        Combine given images into a single image
+        """
         images = [Image.open(base_filepath + x) for x in images]
         widths, heights = zip(*(i.size for i in images))
 

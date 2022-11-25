@@ -10,27 +10,14 @@ from DBConn import DBConn
 import pgnproc
 import twitter_access as ta
 
-
-# Take the game_id of the game
-
-# Call to the callback link to get the player data nad date
-
-# Potentially check which player has played fewer games
-
-# Request the month archive of the game
-
-# Parse the game into the database
-
-# Conduct the evaluation of the game in the database
-
-# Generate the card
-
-
 class CardConstruction:
+    """
+    Request, store, process, store, and plot data from chess.com, specified by game_id
+    """
     
     def __init__(self, db: DBConn, plotter: CardPlotter) -> None:
         
-        # It only makes sense for the CardPlotter to use db
+        # It only makes sense for the CardPlotter to use the same database as CardConstruction
         self.db = db
         self.plotter = plotter
 
