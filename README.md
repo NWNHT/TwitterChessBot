@@ -10,13 +10,10 @@ This 'bot' is designed to periodically search the Twitter hashtag [#chessindata]
 
 The default search period is 30 seconds so accounting for the time it takes to analyze the position it may take a couple of minutes to get a reply.  Anything beyond 5 minutes means that it isn't running or something broke.
 
-The chess.com game ID can be found in the link for the chess.com link.
-
-Example: 
-
-Link: [https://www.chess.com/game/live/46747178545](https://www.chess.com/game/live/46747178545)
-
-Game ID: 46747178545
+The chess.com game ID can be found in the link for the chess.com link.  
+Example:  
+Link: [https://www.chess.com/game/live/46747178545](https://www.chess.com/game/live/46747178545)  
+Game ID: 46747178545  
 
 # Installation
 ### Creating Conda environment
