@@ -369,7 +369,7 @@ class DBConn:
 		for move in top_3:
 			eval_type = 'cp' if move['Centipawn'] is not None else 'mate'
 			clean_top_3.append((move['Move'], 
-								move['Centipawn'] or move['Mate'], 
+								move['Mate'] if move['Centipawn'] is None else move['Centipawn'], 
 								eval_type))
 
 		def safe_get_tuple(lst, idx):
