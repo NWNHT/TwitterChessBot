@@ -82,6 +82,7 @@ class CardPlotter:
         df['material'] = df.material.apply(self.eval_boundary)
         df['eval_shift'] = df['eval'].shift(-1)
 
+        # Set the x limit of the plots
         self.x_limit = df.ply_num.max()
 
         # Create plot
