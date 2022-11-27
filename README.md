@@ -7,7 +7,9 @@ Tweets must be in the format:
 
 # Use
 This 'bot' is designed to periodically search the Twitter hashtag [#chessindata](https://twitter.com/search?q=chessindata) and respond to any new tweet of the format "`chesscom_game_id` #chessindata" with an infographic describing/summarizing the game.
-The default search period is 30 seconds so accounting for the time it takes to analyze the position it may take a couple of minutes to get a reply.  Anything beyond 5 minutes means that it isn't running or something broke.  
+
+The default search period is 30 seconds so accounting for the time it takes to analyze the position it may take a couple of minutes to get a reply.  Anything beyond 5 minutes means that it isn't running or something broke.
+
 The chess.com game ID can be found in the link for the chess.com game view.  
 #### Example:  
 Link: [https://www.chess.com/game/live/46747178545](https://www.chess.com/game/live/46747178545)  
