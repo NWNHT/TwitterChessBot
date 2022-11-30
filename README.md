@@ -18,6 +18,14 @@ Game ID: 46747178545
 #### Result:
 ![46747178545 Result](docs/images/46747178545.jpeg)
 
+Interpretation:
+- All evaluations are presented in units of pawns(points of material).
+- The "Best Move", "Second Best Move", ... represent the count of total best moves played by each player.
+- The Evaluation and Material Balance plot shows the per ply evaluation and material balance.
+  - The colour of the evaluation plot will change to represent the colour of the side with the advantage.
+- The Time Advantage plot shows the time difference from the perspective of the white player.
+- The Evaluation Loss by Move plot shows the [pawn] evaluation lost per move, the difference between the evaluation of the best move and the move actually played.
+
 # Installation
 ### Creating Conda environment
 ```conda create -n env_twitter_chess_bot python=3.9.13```

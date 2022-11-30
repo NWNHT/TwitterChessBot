@@ -129,7 +129,7 @@ class TwitterAPI:
             logger.info(f"Replying to tweet: {reply}")
             media = self.api.media_upload(reply[1])
 
-            self.api.update_status("Test reply with api", 
+            self.api.update_status("All evaluations are in units of pawns(point of material).", 
                                    in_reply_to_status_id=reply[0], 
                                    media_ids=[media.media_id], 
                                    auto_populate_reply_metadata=True)
