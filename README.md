@@ -15,6 +15,9 @@ The chess.com game ID can be found in the link for the chess.com game view.
 Link: [https://www.chess.com/game/live/46747178545](https://www.chess.com/game/live/46747178545)  
 Game ID: 46747178545  
 
+#### Result:
+![46747178545 Result](docs/images/46747178545.jpeg)
+
 # Installation
 ### Creating Conda environment
 ```conda create -n env_twitter_chess_bot python=3.9.13```
