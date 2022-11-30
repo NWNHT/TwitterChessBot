@@ -18,7 +18,7 @@ Game ID: 46747178545
 #### Result:
 ![46747178545 Result](docs/images/46747178545.jpeg)
 
-Interpretation:
+#### Interpretation:
 - All evaluations are presented in units of pawns(points of material).
 - The "Best Move", "Second Best Move", ... represent the count of total best moves played by each player.
 - The Evaluation and Material Balance plot shows the per ply evaluation and material balance.
