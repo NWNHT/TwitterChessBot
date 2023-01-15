@@ -8,7 +8,7 @@ from typing import Tuple
 from cardplotter import CardPlotter
 from DBConn import DBConn
 import pgnproc
-import twitter_access as ta
+import TwitterAPI as ta
 
 logger = logging.getLogger('__main__.' + __name__)
 

@@ -7,7 +7,7 @@ import time
 from cardconstruction import CardConstruction
 from cardplotter import CardPlotter
 from DBConn import DBConn
-import twitter_access as ta
+import TwitterAPI as ta
 
 def main(args):
 
